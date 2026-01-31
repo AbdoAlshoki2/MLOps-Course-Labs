@@ -1,0 +1,27 @@
+experiment_name: "Bank_Churn_Prediction"
+data_path: "../dataset/Churn_Modelling.csv"
+
+runs:
+  - name: "LogReg_v1"
+    model_type: "LogisticRegression"
+    params:
+      max_iter: 1000
+      C: 1.0
+      
+  - name: "LogReg_v2"
+    model_type: "LogisticRegression"
+    params:
+      max_iter: 1500
+      C: 0.5
+      
+  - name: "SVC_v1"
+    model_type: "SVC"
+    params:
+      C: 1.0
+      kernel: "rbf"
+      
+  - name: "RandomForest_v1"
+    model_type: "RandomForestClassifier"
+    params:
+      n_estimators: 100
+      max_depth: 10
