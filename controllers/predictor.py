@@ -50,6 +50,5 @@ class Predictor:
 
     def predict(self, X: PredictionRequest) -> PredictionResponse:
         X_preprocessed = self._preprocess(X)
-        return PredictionResponse(
-            probability=self.model.predict_proba(X_preprocessed)[:, 1][0]
-        )
+        probability = float(self.model.predict_proba(X_preprocessed)[:, 1][0])
+        return PredictionResponse(ProbabilityOfExiting=probability)

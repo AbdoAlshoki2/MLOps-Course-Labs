@@ -7,43 +7,38 @@ Then open:
     http://localhost:8000/schema/swagger
 """
 
-from litestar import Litestar
-from pydantic import BaseModel
+from litestar import Litestar, get
 
-from app.logger_setup import setup_logging
+from utils.logger_setup import setup_logging
+from routers.prediction import PredictionController
 
 logger = setup_logging()
-
-
-# ---------------------------------------------------------------------------
-# Request Schema
-# ---------------------------------------------------------------------------
-class ChurnRequest(BaseModel):
-    # TODO 1: Add one field (type float) per feature your model expects
-    pass
 
 
 # ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
 
-# TODO 2: Create a GET endpoint at "/" that returns a welcome message
-#         Log that the home endpoint was accessed
 
-# TODO 3: Create a GET endpoint at "/health" that returns {"status": "healthy"}
+@get("/")
+async def index() -> dict:
+    logger.info("Home endpoint accessed.")
+    return {"message": "Welcome to the Churn Prediction API!"}
 
-# TODO 4: Create a POST endpoint at "/predict" that:
-#         - Accepts a ChurnRequest as the data parameter
-#         - Extracts features into a list
-#         - Calls predict_churn(features)
-#         - Returns the prediction
-#         - Logs the input features and the prediction result
+
+@get("/health")
+async def health() -> dict:
+    return {"status": "healthy"}
 
 
 # ---------------------------------------------------------------------------
 # App
 # ---------------------------------------------------------------------------
-# TODO 5: Register your endpoint functions in the list below
+
 app = Litestar(
-    route_handlers=[],
+    route_handlers=[
+        index,
+        health,
+        PredictionController,
+    ],
 )
