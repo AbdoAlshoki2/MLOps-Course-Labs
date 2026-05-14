@@ -5,6 +5,7 @@ for bank consumer churn prediction.
 import warnings
 warnings.filterwarnings("ignore")
 import os
+import joblib
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.utils import resample
@@ -121,8 +122,10 @@ def preprocess(df):
     X_test = pd.DataFrame(X_test, columns=col_transf.get_feature_names_out())
 
     # Log the transformer as an artifact
-    mlflow.sklearn.log_model(sk_model=col_transf, artifact_path="preprocessing_pipeline")
+    # mlflow.sklearn.log_model(sk_model=col_transf, artifact_path="preprocessing_pipeline")
 
+    joblib.dump(col_transf, "artifacts/column_transformer.joblib")
+    mlflow.log_artifact("artifacts/column_transformer.joblib")
     return col_transf, X_train, X_test, y_train, y_test
 
 
