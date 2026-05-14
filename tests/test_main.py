@@ -6,29 +6,80 @@ Run with:
     pytest tests/ -v --cov=app --cov=main --cov-report=term-missing
 """
 
+from litestar.testing import TestClient
+from main import app
+from schemas.prediction import PredictionRequest
+from controllers.predictor import Predictor
+
+
+predictor = Predictor()
+
 
 # ---------------------------------------------------------------------------
 # Function Tests
 # ---------------------------------------------------------------------------
+def test_predictor_function_directly():
+    # Use mock data matching the BaseModel
+    sample_data = PredictionRequest(
+        CreditScore=600,
+        Geography="France",
+        Gender="Male",
+        Age=40,
+        Tenure=3,
+        Balance=60000.0,
+        NumOfProducts=2,
+        HasCrCard=1,
+        IsActiveMember=1,
+        EstimatedSalary=50000.0,
+    )
+    result = predictor.predict(sample_data)
 
-# TODO 1: Write a test that calls predict_churn() directly with sample features
-#         and asserts the result is 0 or 1
-#         Hint: import predict_churn from app.model_utils
-
-# TODO 2 (bonus): Write another function test with edge-case inputs
+    assert hasattr(result, "ProbabilityOfExiting")
+    assert 0.0 <= result.ProbabilityOfExiting <= 1.0
 
 
 # ---------------------------------------------------------------------------
 # Endpoint Tests
 # ---------------------------------------------------------------------------
+def test_get_root():
+    with TestClient(app=app) as client:
+        response = client.get("/")
+        assert response.status_code == 200
+        assert response.json() == {"message": "Welcome to the Churn Prediction API!"}
 
-# TODO 3: Write a test that POSTs to /predict with valid JSON
-#         and checks the status code and response body
-#         Hint: Litestar POST returns 201, not 200
-#         Hint: use `with TestClient(app=app) as client:`
 
-# TODO 4: Write a test for GET /health
+def test_get_health():
+    with TestClient(app=app) as client:
+        response = client.get("/health")
+        assert response.status_code == 200
+        assert response.json() == {"status": "healthy"}
 
-# TODO 5: Write a test for GET /
 
-# TODO 6 (bonus): Test that invalid input returns status 400
+def test_post_predict_valid():
+    with TestClient(app=app) as client:
+        payload = {
+            "CreditScore": 600,
+            "Geography": "France",
+            "Gender": "Male",
+            "Age": 40,
+            "Tenure": 3,
+            "Balance": 60000.0,
+            "NumOfProducts": 2,
+            "HasCrCard": 1,
+            "IsActiveMember": 1,
+            "EstimatedSalary": 50000.0,
+        }
+
+        response = client.post("/predict", json=payload)
+        assert response.status_code == 201
+
+        data = response.json()
+        assert "ProbabilityOfExiting" in data
+        assert 0.0 <= float(data["ProbabilityOfExiting"]) <= 1.0
+
+
+def test_post_predict_invalid_input():
+    with TestClient(app=app) as client:
+        response = client.post("/predict", json={"Age": "Not a number"})
+
+        assert response.status_code == 400
