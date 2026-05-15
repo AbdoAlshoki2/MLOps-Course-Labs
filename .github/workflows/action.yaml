@@ -57,4 +57,4 @@ jobs:
             docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-mlapp:latest
             docker stop my-mlapp || true
             docker rm my-mlapp || true
-            docker run -d -p 443:8000 -p 80:8000 --name my-mlapp ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-mlapp:latest 
+            docker run -d -p 80:8000 --name my-mlapp ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-mlapp:latest 
