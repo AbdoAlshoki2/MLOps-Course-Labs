@@ -42,6 +42,7 @@ jobs:
           ECR_REPOSITORY: my-mlapp
           IMAGE_TAG: latest
         run: |
+          aws ecr describe-repositories --repository-names $ECR_REPOSITORY || aws ecr create-repository --repository-name $ECR_REPOSITORY --region ${{ secrets.AWS_REGION }}
           docker tag my-mlapp:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
